@@ -20,6 +20,7 @@ public class ActorSearch {
     private Integer ageTo;
     private LocalDate birthDateFrom;
     private LocalDate birthDateTo;
+    private Integer birthYear;
     private ActorSort actorSort;
 
 }

@@ -1,9 +1,6 @@
 package springbootapp.movieclub.search;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import springbootapp.movieclub.entity.Actor;
@@ -71,6 +68,11 @@ public class ActorSpec implements Specification<Actor> {
         }
         if (search.getBirthDateFrom() != null){
             predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("birthDate"), search.getBirthDateFrom()));
+        }
+        if (search.getBirthYear() != null) {
+            int birthYear = search.getBirthYear();
+            Expression<Integer> yearExpression = criteriaBuilder.function("YEAR", Integer.class, root.get("birthDate"));
+            predicates.add(criteriaBuilder.equal(yearExpression, birthYear));
         }
 
         predicates.add(criteriaBuilder.isNull(root.get("deletionTime")));

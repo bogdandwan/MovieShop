@@ -15,4 +15,6 @@ public interface ExpositionService {
 
     void softDelete(Long id);
 
+    public String formatBankAccNumber(String bankAccNumber);
+
 }

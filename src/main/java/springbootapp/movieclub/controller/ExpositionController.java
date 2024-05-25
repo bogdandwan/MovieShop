@@ -10,6 +10,8 @@ import springbootapp.movieclub.search.ExpositionSearch;
 import springbootapp.movieclub.service.ExpositionService;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @RestController
@@ -17,6 +19,9 @@ import java.util.stream.Collectors;
 public class ExpositionController {
 
     private final ExpositionService expositionService;
+    private static final Pattern BANK_ACC_NUMBER_PATTERN = Pattern.compile("^\\d{3}-(\\d{13})-\\d{2}$");
+
+
 
     @PostMapping("/exposition")
     public void saveOrUpdateExposition(@RequestBody ApiExposition apiExposition){
@@ -34,19 +39,13 @@ public class ExpositionController {
         exposition.setAddress(apiExposition.getAddress());
         exposition.setCity(apiExposition.getCity());
         exposition.setPhoneNumber(apiExposition.getPhoneNumber());
-        exposition.setBankAccNumber(apiExposition.getBankAccNumber());
+
+        String formattedBankAccNumber = expositionService.formatBankAccNumber(apiExposition.getBankAccNumber());
+        exposition.setBankAccNumber(formattedBankAccNumber);
 
         expositionService.save(exposition);
     }
 
-    @GetMapping("/exposition/{id}")
-    public ApiExposition getExpositionById(@PathVariable Long id){
-        final Exposition exposition = expositionService.findById(id);
-        if(exposition == null){
-            throw new NotFoundException("Exposition not found");
-        }
-        return new ApiExposition(exposition);
-    }
 
     @GetMapping("/expositions")
     public List<ApiExposition> getExpositions(

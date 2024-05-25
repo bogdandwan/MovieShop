@@ -65,6 +65,12 @@ public class MovieItemSpec implements Specification<MovieItem> {
                 query.orderBy(criteriaBuilder.asc(movieJoin.get("name")));
             }
         }
+        if (search.getMovieItemSort() != null){
+            if (search.getMovieItemSort() == MovieItemSort.NAME_DESC){
+                Join<MovieItem, Movie> movieJoin = root.join("movie");
+                query.orderBy(criteriaBuilder.desc(movieJoin.get("name")));
+            }
+        }
 
 
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

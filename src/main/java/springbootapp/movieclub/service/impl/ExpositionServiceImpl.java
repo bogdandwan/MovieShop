@@ -12,12 +12,14 @@ import springbootapp.movieclub.service.ExpositionService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
 public class ExpositionServiceImpl implements ExpositionService {
 
     private final ExpositionRepository expositionRepository;
+    private static final Pattern BANK_ACC_NUMBER_PATTERN = Pattern.compile("^\\d{3}-(\\d{13})-\\d{2}$");
 
 
     @Override
@@ -42,5 +44,19 @@ public class ExpositionServiceImpl implements ExpositionService {
             exposition.setDeletionTime(LocalDate.now());
             expositionRepository.save(exposition);
         }
+    }
+
+    @Override
+    public String formatBankAccNumber(String bankAccNumber) {
+        String[] parts = bankAccNumber.split("-");
+        if (parts.length != 3) {
+            throw new IllegalArgumentException("Nevalidan format žiro računa!");
+        }
+
+        String middlePart = parts[1];
+        String middlePartWithZeros = String.format("%013d", Long.parseLong(middlePart));
+
+
+        return parts[0] + "-" + middlePartWithZeros + "-" + parts[2];
     }
 }
