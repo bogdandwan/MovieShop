@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "user")
 @Data
@@ -30,6 +32,9 @@ public class User {
     @NotBlank
     @Column(nullable = false, name = "password")
     private String password;
+
+    @Column(name = "deletion_time")
+    private LocalDateTime deletionTime;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")

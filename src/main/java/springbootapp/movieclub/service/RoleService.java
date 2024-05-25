@@ -10,7 +10,7 @@ public interface RoleService {
 
     void save(Role role);
 
-    List<Role> findAllRoles();
+    void softDelete(Long id);
 
     List<Role> findAll(RoleSearch search);
 

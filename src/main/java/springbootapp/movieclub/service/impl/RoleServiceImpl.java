@@ -9,6 +9,7 @@ import springbootapp.movieclub.search.RoleSearch;
 import springbootapp.movieclub.search.RoleSpec;
 import springbootapp.movieclub.service.RoleService;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -30,8 +31,12 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
-    public List<Role> findAllRoles() {
-        return roleRepository.findAll();
+    public void softDelete(Long id) {
+        Role role = roleRepository.findById(id).orElse(null);
+        if (role != null) {
+            role.setDeletionTime(LocalDate.now());
+            roleRepository.save(role);
+        }
     }
 
     @Override

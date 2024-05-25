@@ -1,6 +1,10 @@
 package springbootapp.movieclub.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
 import springbootapp.movieclub.dto.ApiMovieItem;
 import springbootapp.movieclub.entity.Exposition;
@@ -10,9 +14,11 @@ import springbootapp.movieclub.entity.MovieItem;
 import springbootapp.movieclub.entity.enums.MovieItemSort;
 import springbootapp.movieclub.exceptions.NotFoundException;
 import springbootapp.movieclub.search.MovieItemSearch;
+import springbootapp.movieclub.search.MovieItemSpec;
 import springbootapp.movieclub.service.ExpositionService;
 import springbootapp.movieclub.service.MovieItemService;
 import springbootapp.movieclub.service.MovieService;
+import springbootapp.movieclub.service.PaginationService;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,9 +27,9 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MovieItemController {
 
-    final MovieItemService movieItemService;
-    final ExpositionService expositionService;
-    final MovieService movieService;
+    private final MovieItemService movieItemService;
+    private final ExpositionService expositionService;
+    private final PaginationService<MovieItem> paginationService;
 
 
 
@@ -73,14 +79,16 @@ public class MovieItemController {
 
 
     @GetMapping("/movie-items")
-    public List<ApiMovieItem> getAllMovieItems(
+    public Page<ApiMovieItem> getAllMovieItems(
             @RequestParam(required = false) Double price,
             @RequestParam(required = false) Long expositionId,
             @RequestParam(required = false) Genre genre,
             @RequestParam(required = false) Integer lengthFrom,
             @RequestParam(required = false) Integer lengthTo,
             @RequestParam(required = false) String movieNameLike,
-            @RequestParam(required = false)MovieItemSort movieItemSort){
+            @RequestParam(required = false)MovieItemSort movieItemSort,
+            @RequestParam(required = false, defaultValue = "0") Integer offset,
+            @RequestParam(required = false, defaultValue = "10") Integer limit) {
 
         final MovieItemSearch search = new MovieItemSearch();
 
@@ -100,8 +108,12 @@ public class MovieItemController {
             search.setExposition(exposition);
         }
 
-        final List<MovieItem> movieItems = movieItemService.findAll(search);
-        return movieItems.stream().map(ApiMovieItem::new).collect(Collectors.toList());
+        Pageable pageable = PageRequest.of(offset, limit);
+        Specification<MovieItem> spec = new MovieItemSpec(search);
+        Page<MovieItem> movieItemPage = paginationService.findAll(spec, pageable, MovieItem.class);
+
+
+        return movieItemPage.map(this::mapToApiMovieItem);
     }
 
 
@@ -116,6 +128,13 @@ public class MovieItemController {
     @DeleteMapping("/movie-item/{id}")
     public void softDeleteMovieItem(@PathVariable Long id){
         movieItemService.softDelete(id);
+    }
+
+    public ApiMovieItem mapToApiMovieItem(MovieItem movieItem){
+        ApiMovieItem apiMovieItem = new ApiMovieItem();
+        apiMovieItem.setId(movieItem.getId());
+        apiMovieItem.setPrice(movieItem.getPrice());
+        return apiMovieItem;
     }
 }
 

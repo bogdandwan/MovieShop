@@ -14,23 +14,7 @@ public interface UserService {
 
     User findById(Long id);
 
-    List<User> filterUsers(String usernameLike, String firstName, String lastName, Long roleId);
-
-    void updateUser(Long userId, ApiUser apiUser);
-
-
-
-
-
-    List<User> findAllUsers();
-
-    List<User> findAllUsersByUsername(String username);
-
-    List<User> findAllUsersByLastName(String lastName);
-
-    List<User> findAllUsersByFirstName(String firstName);
-
-    List<User> findAllUsersByRole(Role id);
+    void softDelete(Long id);
 
     List<User> findAll(UserSearch search);
 }

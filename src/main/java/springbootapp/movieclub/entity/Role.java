@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import springbootapp.movieclub.entity.enums.Privilege;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -33,4 +34,7 @@ public class Role {
 
     public Role() {
     }
+
+    @Column(name = "deletion_time")
+    private LocalDate deletionTime;
 }

@@ -22,7 +22,7 @@ import java.time.LocalDate;
 public class ActorController {
 
     private final ActorService actorService;
-    private final PaginationService paginationService;
+    private final PaginationService<Actor> paginationService;
 
 
     @PostMapping("/actor")
@@ -69,7 +69,7 @@ public class ActorController {
             @RequestParam(required = false) ActorSort actorSort,
             @RequestParam(required = false) Integer birthYear,
             @RequestParam(required = false, defaultValue = "0") Integer offset,
-            @RequestParam(required = false, defaultValue = "10") Integer size) {
+            @RequestParam(required = false, defaultValue = "10") Integer limit) {
 
         final ActorSearch search = new ActorSearch()
                 .setFirstNameLike(firstNameLike)
@@ -84,7 +84,7 @@ public class ActorController {
                 .setBirthYear(birthYear);
 
 
-        Pageable pageable = PageRequest.of(offset, size);
+        Pageable pageable = PageRequest.of(offset, limit);
         Specification<Actor> spec = new ActorSpec(search);
         Page<Actor> actorPage = paginationService.findAll(spec, pageable, Actor.class);
 
