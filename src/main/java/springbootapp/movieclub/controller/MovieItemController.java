@@ -8,20 +8,16 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
 import springbootapp.movieclub.dto.ApiMovieItem;
 import springbootapp.movieclub.entity.Exposition;
-import springbootapp.movieclub.entity.enums.Genre;
 import springbootapp.movieclub.entity.Movie;
 import springbootapp.movieclub.entity.MovieItem;
+import springbootapp.movieclub.entity.enums.Genre;
 import springbootapp.movieclub.entity.enums.MovieItemSort;
 import springbootapp.movieclub.exceptions.NotFoundException;
 import springbootapp.movieclub.search.MovieItemSearch;
 import springbootapp.movieclub.search.MovieItemSpec;
 import springbootapp.movieclub.service.ExpositionService;
 import springbootapp.movieclub.service.MovieItemService;
-import springbootapp.movieclub.service.MovieService;
 import springbootapp.movieclub.service.PaginationService;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -61,21 +57,6 @@ public class MovieItemController {
 
         movieItemService.save(movieItem);
     }
-
-
-
-    @PatchMapping("/movie-item/{id}")
-    public void updateMovieItem(@PathVariable Long id, @RequestBody ApiMovieItem apiMovieItem) {
-        MovieItem movieItem = movieItemService.findById(id);
-
-        if (movieItem == null){
-            throw new NotFoundException("Movie item not found");
-        }
-
-        movieItem.setPrice(apiMovieItem.getPrice());
-        movieItemService.save(movieItem);
-    }
-
 
 
     @GetMapping("/movie-items")

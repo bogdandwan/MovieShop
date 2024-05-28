@@ -12,6 +12,7 @@ public class ApiMovieItem {
     private Double price;
     private ApiMovie movie;
     private ApiExposition exposition;
+    private Boolean available; //da li je dostupan ili nije
 
 
     public ApiMovieItem (MovieItem movieItem){

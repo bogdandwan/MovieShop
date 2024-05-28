@@ -22,5 +22,7 @@ public class ApiExposition {
         id=exposition.getId();
         address=exposition.getAddress();
         city=exposition.getCity();
+        phoneNumber=exposition.getPhoneNumber();
+        bankAccNumber=exposition.getBankAccNumber();
     }
 }

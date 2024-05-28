@@ -27,6 +27,9 @@ public class Role {
     @Column(name = "privilege",columnDefinition = "varchar(255)")
     private List<Privilege> privileges;
 
+    @Column(name = "deletion_time")
+    private LocalDate deletionTime;
+
     public Role(String name, List<Privilege> privileges) {
         this.name = name;
         this.privileges = privileges;
@@ -35,6 +38,5 @@ public class Role {
     public Role() {
     }
 
-    @Column(name = "deletion_time")
-    private LocalDate deletionTime;
+
 }

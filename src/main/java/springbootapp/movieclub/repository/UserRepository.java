@@ -9,14 +9,6 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByUsername(String username);
 
-    List<User> findByUsernameLike(String username);
-
-    List<User> findAllUsersByLastNameLike(String lastName);
-
-    List<User> findAllUsersByFirstNameLike(String firstName);
-
-    List<User> findAllUserByRole(Role id);
-
     List<User> findAll(Specification<User> spec);
 
 }
