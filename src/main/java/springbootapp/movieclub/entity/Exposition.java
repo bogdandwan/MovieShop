@@ -27,7 +27,6 @@ public class Exposition {
     @Column(name = "city", nullable = false)
     private String city;
 
-
     @OneToMany(mappedBy = "exposition",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
     private List<MovieItem> movieItems;
 
@@ -40,5 +39,8 @@ public class Exposition {
 
     @Column(name = "deletion_time")
     private LocalDate deletionTime;
+
+    @OneToMany(mappedBy = "exposition", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Rental> rentals;
 
 }

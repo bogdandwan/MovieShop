@@ -67,7 +67,7 @@ public class MovieItemController {
             @RequestParam(required = false) Integer lengthFrom,
             @RequestParam(required = false) Integer lengthTo,
             @RequestParam(required = false) String movieNameLike,
-            @RequestParam(required = false)MovieItemSort movieItemSort,
+            @RequestParam(required = false) MovieItemSort movieItemSort,
             @RequestParam(required = false, defaultValue = "0") Integer offset,
             @RequestParam(required = false, defaultValue = "10") Integer limit) {
 

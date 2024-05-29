@@ -3,15 +3,16 @@ package springbootapp.movieclub.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import springbootapp.movieclub.dto.ApiRental;
-import springbootapp.movieclub.entity.MovieItem;
-import springbootapp.movieclub.entity.Rental;
-import springbootapp.movieclub.entity.User;
+import springbootapp.movieclub.entity.*;
 import springbootapp.movieclub.exceptions.NotFoundException;
 import springbootapp.movieclub.exceptions.ValidationException;
+import springbootapp.movieclub.search.RentalSearch;
+import springbootapp.movieclub.service.ExpositionService;
 import springbootapp.movieclub.service.MovieItemService;
 import springbootapp.movieclub.service.RentalService;
 import springbootapp.movieclub.service.UserService;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,13 +23,20 @@ public class RentalController {
     private final RentalService rentalService;
     private final MovieItemService movieItemService;
     private final UserService userService;
+    private final ExpositionService expositionService;
 
 
     @PostMapping("/rental")
     public void saveRental(@RequestBody ApiRental apiRental) {
         final Rental rental = new Rental();
 
-        rental.setRentalDate(apiRental.getRentalDate()).setRentalExpiration(apiRental.getRentalExpiration());
+        rental.setRentalDate(LocalDate.now()).setRentalExpiration(LocalDate.now().plusDays(10));
+
+        if(apiRental.getExposition() != null){
+            Exposition exposition = new Exposition()
+                    .setId(apiRental.getExposition().getId());
+            rental.setExposition(exposition);
+        }
 
 
         if (apiRental.getMovieItems() != null && !apiRental.getMovieItems().isEmpty()) {
@@ -65,14 +73,42 @@ public class RentalController {
 
     @PatchMapping("/rental/{id}")
     public void saveReturnDate(@PathVariable Long id, @RequestBody ApiRental apiRental) {
-        Rental rental = rentalService.findById(apiRental.getId());
+        Rental rental = rentalService.findById(id);
 
         if (rental == null) {
             throw new NotFoundException("Rental not found");
         }
 
-        //rentalService.updateReturnDate(rental, apiRental.getReturnDate());
+        rentalService.updateReturnDate(rental, apiRental.getReturnDate());
+    }
 
+    @GetMapping("/rentals")
+    public List<ApiRental> getAllRentals(@RequestParam(required = false) Long expositionId,
+                                         @RequestParam(required = false) LocalDate rentalDate,
+                                         @RequestParam(required = false) LocalDate rentalExpiration,
+                                         @RequestParam(required = false) LocalDate returnDate,
+                                         @RequestParam(required = false) User client,
+                                         @RequestParam(required = false) User worker,
+                                         @RequestParam(required = false) Boolean active){
+
+        final RentalSearch search = new RentalSearch()
+                .setRentalDate(rentalDate)
+                .setRentalExpiration(rentalExpiration)
+                .setReturnDate(returnDate)
+                .setClient(client)
+                .setWorker(worker);
+
+        if(expositionId != null){
+            final Exposition exposition = expositionService.findById(expositionId);
+            if (exposition == null){
+                throw new NotFoundException("Exposition not found");
+            }
+            search.setExposition(exposition);
+        }
+
+        final List<Rental> rentals = rentalService.findAll(search);
+
+        return rentals.stream().map(ApiRental::new).collect(Collectors.toList());
     }
 
 }

@@ -23,10 +23,13 @@ public class Rental {
     @JoinColumn(name = "client_id", nullable = false)
     private User client;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "worker_id", nullable = false)
     private User worker;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "exposition_id")
+    private Exposition exposition;
 
     @Column(name = "rental_date", nullable = false)
     @NotNull
