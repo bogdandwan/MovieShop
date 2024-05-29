@@ -17,6 +17,7 @@ import springbootapp.movieclub.search.MovieItemSearch;
 import springbootapp.movieclub.search.MovieItemSpec;
 import springbootapp.movieclub.service.ExpositionService;
 import springbootapp.movieclub.service.MovieItemService;
+import springbootapp.movieclub.service.MovieService;
 import springbootapp.movieclub.service.PaginationService;
 
 @RestController
@@ -26,6 +27,7 @@ public class MovieItemController {
     private final MovieItemService movieItemService;
     private final ExpositionService expositionService;
     private final PaginationService<MovieItem> paginationService;
+    private final MovieService movieService;
 
 
 
@@ -45,14 +47,25 @@ public class MovieItemController {
 
         movieItem.setPrice(apiMovieItem.getPrice());
 
-        if(apiMovieItem.getMovie() !=null && apiMovieItem.getExposition() != null){
+        if(apiMovieItem.getExposition() != null) {
             Exposition exposition = new Exposition()
                     .setId(apiMovieItem.getExposition().getId());
             movieItem.setExposition(exposition);
+        }else {
+            movieItem.setExposition(null);
+        }
 
-            Movie movie = new Movie()
-                    .setId(apiMovieItem.getMovie().getId());
+        if (apiMovieItem.getMovie() != null) {
+            Movie movie = movieService.findById(apiMovieItem.getMovie().getId());
+            if (movie == null) {
+                throw new NotFoundException("Movie not found");
+            }
             movieItem.setMovie(movie);
+        }
+        if (movieItem.getExposition() == null) {
+            movieItem.setAvailable(false);
+        } else {
+            movieItem.setAvailable(apiMovieItem.getAvailable());
         }
 
         movieItemService.save(movieItem);
@@ -67,6 +80,7 @@ public class MovieItemController {
             @RequestParam(required = false) Integer lengthFrom,
             @RequestParam(required = false) Integer lengthTo,
             @RequestParam(required = false) String movieNameLike,
+            @RequestParam(required = false) Boolean available,
             @RequestParam(required = false) MovieItemSort movieItemSort,
             @RequestParam(required = false, defaultValue = "0") Integer offset,
             @RequestParam(required = false, defaultValue = "10") Integer limit) {
@@ -79,6 +93,9 @@ public class MovieItemController {
         search.setMovieNameLike(movieNameLike);
         search.setMovieLengthFrom(lengthFrom);
         search.setMovieItemSort(movieItemSort);
+        search.setAvailable(available);
+
+
 
 
         if(expositionId != null){
@@ -115,6 +132,7 @@ public class MovieItemController {
         ApiMovieItem apiMovieItem = new ApiMovieItem();
         apiMovieItem.setId(movieItem.getId());
         apiMovieItem.setPrice(movieItem.getPrice());
+        apiMovieItem.setAvailable(movieItem.getAvailable());
         return apiMovieItem;
     }
 }

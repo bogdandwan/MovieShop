@@ -24,6 +24,7 @@ public class ApiMovieItem {
         if (movieItem.getExposition() != null){
             exposition = new ApiExposition(movieItem.getExposition());
         }
+        available = movieItem.getAvailable();
 
     }
 

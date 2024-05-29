@@ -20,6 +20,7 @@ public class MovieItemSearch {
     private Integer movieLengthTo;
     private Integer movieLengthFrom;
     private String movieNameLike;
+    private Boolean available;
     private MovieItemSort movieItemSort;
 
 }

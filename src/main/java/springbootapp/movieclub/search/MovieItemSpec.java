@@ -44,6 +44,9 @@ public class MovieItemSpec implements Specification<MovieItem> {
             Join<MovieItem, Movie> movieJoin = root.join("movie");
             predicates.add(criteriaBuilder.like(movieJoin.get("name"), "%" + search.getMovieNameLike() + "%"));
         }
+        if (search.getAvailable() != null){
+            predicates.add(criteriaBuilder.equal(root.get("available"), search.getAvailable()));
+        }
 
         predicates.add(criteriaBuilder.isNull(root.get("deletionTime")));
 

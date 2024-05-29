@@ -34,4 +34,7 @@ public class MovieItem {
     @JoinColumn(name = "exposition_id")
     private Exposition exposition;
 
+    @Column(name = "available", nullable = false)
+    private Boolean available;
+
 }
