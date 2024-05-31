@@ -82,6 +82,7 @@ public class RentalController {
         rentalService.updateReturnDate(rental, apiRental.getReturnDate());
     }
 
+
     @GetMapping("/rentals")
     public List<ApiRental> getAllRentals(@RequestParam(required = false) Long expositionId,
                                          @RequestParam(required = false) LocalDate rentalDate,
@@ -105,10 +106,28 @@ public class RentalController {
             }
             search.setExposition(exposition);
         }
+        if (active != null){
+            if(active){
+                search.setActive(true);
+                search.setReturnDate(null);
+            }else {
+                search.setActive(false);
+            }
+        }
+
 
         final List<Rental> rentals = rentalService.findAll(search);
 
         return rentals.stream().map(ApiRental::new).collect(Collectors.toList());
+    }
+
+    @GetMapping("rental/{id}")
+    public ApiRental getRentalById(@PathVariable Long id) {
+        Rental rental = rentalService.findById(id);
+        if (rental == null) {
+            throw new NotFoundException("Rental not found");
+        }
+        return new ApiRental(rental);
     }
 
 }

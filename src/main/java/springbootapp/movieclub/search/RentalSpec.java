@@ -40,6 +40,13 @@ public class RentalSpec implements Specification<Rental> {
             Join<Rental, User> workerJoin = root.join("worker");
             predicates.add(criteriaBuilder.equal(workerJoin.get("id"), search.getWorker().getId()));
         }
+        if (search.getActive() != null) {
+            if (search.getActive()) {
+                predicates.add(criteriaBuilder.isNull(root.get("returnDate")));
+            } else {
+                predicates.add(criteriaBuilder.isNotNull(root.get("returnDate")));
+            }
+        }
 
 
 
