@@ -46,6 +46,7 @@ public class RentalServiceImpl implements RentalService {
         return rentalRepository.findById(id).orElse(null);
     }
 
+
     @Transactional
     @Override
     public void updateReturnDate(Rental rental, LocalDate returnDate) {

@@ -3,7 +3,11 @@ package springbootapp.movieclub.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import springbootapp.movieclub.dto.ApiRental;
-import springbootapp.movieclub.entity.*;
+import springbootapp.movieclub.entity.Exposition;
+import springbootapp.movieclub.entity.MovieItem;
+import springbootapp.movieclub.entity.Rental;
+import springbootapp.movieclub.entity.User;
+import springbootapp.movieclub.entity.enums.RentalSort;
 import springbootapp.movieclub.exceptions.NotFoundException;
 import springbootapp.movieclub.exceptions.ValidationException;
 import springbootapp.movieclub.search.RentalSearch;
@@ -52,6 +56,7 @@ public class RentalController {
             throw new ValidationException("Movie items can't be empty");
         }
 
+
         if (apiRental.getClient() != null) {
             User client = userService.findById(apiRental.getClient().getId());
             if (client == null) {
@@ -90,14 +95,19 @@ public class RentalController {
                                          @RequestParam(required = false) LocalDate returnDate,
                                          @RequestParam(required = false) User client,
                                          @RequestParam(required = false) User worker,
-                                         @RequestParam(required = false) Boolean active){
+                                         @RequestParam(required = false) Boolean active,
+                                         @RequestParam(required = false) RentalSort rentalSort){
+
+
 
         final RentalSearch search = new RentalSearch()
                 .setRentalDate(rentalDate)
                 .setRentalExpiration(rentalExpiration)
                 .setReturnDate(returnDate)
                 .setClient(client)
-                .setWorker(worker);
+                .setWorker(worker)
+                .setRentalSort(rentalSort);
+
 
         if(expositionId != null){
             final Exposition exposition = expositionService.findById(expositionId);
@@ -114,6 +124,7 @@ public class RentalController {
                 search.setActive(false);
             }
         }
+
 
 
         final List<Rental> rentals = rentalService.findAll(search);

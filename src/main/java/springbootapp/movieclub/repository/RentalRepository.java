@@ -29,4 +29,5 @@ public interface RentalRepository extends JpaRepository<Rental, Long>, JpaSpecif
     @Query("SELECT r FROM Rental r WHERE r.client.id = :clientId AND r.returnDate IS NULL")
     List<Rental> findActiveRentalsByClientId(@Param("clientId") Long clientId);
 
+
 }

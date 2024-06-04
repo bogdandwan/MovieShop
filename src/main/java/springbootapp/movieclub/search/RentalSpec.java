@@ -6,6 +6,7 @@ import org.springframework.data.jpa.domain.Specification;
 import springbootapp.movieclub.entity.Exposition;
 import springbootapp.movieclub.entity.Rental;
 import springbootapp.movieclub.entity.User;
+import springbootapp.movieclub.entity.enums.RentalSort;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +48,26 @@ public class RentalSpec implements Specification<Rental> {
                 predicates.add(criteriaBuilder.isNotNull(root.get("returnDate")));
             }
         }
-
+        if (search.getRentalSort() != null){
+            if (search.getRentalSort() == RentalSort.RENTAL_DATE_ASC){
+                query.orderBy(criteriaBuilder.asc(root.get("rentalDate")));
+            }
+            if (search.getRentalSort() == RentalSort.RENTAL_DATE_DESC){
+                query.orderBy(criteriaBuilder.desc(root.get("rentalDate")));
+            }
+            if (search.getRentalSort() == RentalSort.RENTAL_EXPIRATION_ASC){
+                query.orderBy(criteriaBuilder.asc(root.get("rentalExpiration")));
+            }
+            if (search.getRentalSort() == RentalSort.RENTAL_EXPIRATION_DESC){
+                query.orderBy(criteriaBuilder.desc(root.get("rentalExpiration")));
+            }
+            if (search.getRentalSort() == RentalSort.RETURN_DATE_ASC){
+                query.orderBy(criteriaBuilder.asc(root.get("returnDate")));
+            }
+            if (search.getRentalSort() == RentalSort.RETURN_DATE_DESC){
+                query.orderBy(criteriaBuilder.desc(root.get("returnDate")));
+            }
+        }
 
 
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));

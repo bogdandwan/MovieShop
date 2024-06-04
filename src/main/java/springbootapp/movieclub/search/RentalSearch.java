@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 import springbootapp.movieclub.entity.Exposition;
 import springbootapp.movieclub.entity.User;
+import springbootapp.movieclub.entity.enums.RentalSort;
 
 import java.time.LocalDate;
 
@@ -20,5 +21,5 @@ public class RentalSearch {
     private User client;
     private User worker;
     private Boolean active;
-
+    private RentalSort rentalSort;
 }

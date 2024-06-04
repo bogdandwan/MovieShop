@@ -12,7 +12,7 @@ public interface RentalService {
 
     Rental findById(Long id);
 
-    //long count(//RentalSearch search);
+   // long countActiveRentalsByMovieItemId(Long movieItemId);
 
     void updateReturnDate(Rental rental, LocalDate returnDate);
 
