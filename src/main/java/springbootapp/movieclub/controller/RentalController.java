@@ -96,7 +96,8 @@ public class RentalController {
                                          @RequestParam(required = false) User client,
                                          @RequestParam(required = false) User worker,
                                          @RequestParam(required = false) Boolean active,
-                                         @RequestParam(required = false) RentalSort rentalSort){
+                                         @RequestParam(required = false) RentalSort rentalSort,
+                                         @RequestParam(required = false) Integer countMovieItemId){
 
 
 
@@ -106,7 +107,8 @@ public class RentalController {
                 .setReturnDate(returnDate)
                 .setClient(client)
                 .setWorker(worker)
-                .setRentalSort(rentalSort);
+                .setRentalSort(rentalSort)
+                .setCountMovieItemId(countMovieItemId);
 
 
         if(expositionId != null){

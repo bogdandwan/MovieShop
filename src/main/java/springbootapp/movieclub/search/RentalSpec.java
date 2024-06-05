@@ -4,6 +4,7 @@ import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.domain.Specification;
 import springbootapp.movieclub.entity.Exposition;
+import springbootapp.movieclub.entity.MovieItem;
 import springbootapp.movieclub.entity.Rental;
 import springbootapp.movieclub.entity.User;
 import springbootapp.movieclub.entity.enums.RentalSort;
@@ -48,6 +49,13 @@ public class RentalSpec implements Specification<Rental> {
                 predicates.add(criteriaBuilder.isNotNull(root.get("returnDate")));
             }
         }
+        if (search.getCountMovieItemId() != null) {
+            Join<Rental, MovieItem> movieItemJoin = root.join("movieItems");
+            predicates.add(criteriaBuilder.equal(movieItemJoin.get("id"), search.getCountMovieItemId()));
+            predicates.add(criteriaBuilder.isNull(root.get("returnDate")));
+        }
+
+
         if (search.getRentalSort() != null){
             if (search.getRentalSort() == RentalSort.RENTAL_DATE_ASC){
                 query.orderBy(criteriaBuilder.asc(root.get("rentalDate")));

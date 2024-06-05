@@ -22,4 +22,5 @@ public class RentalSearch {
     private User worker;
     private Boolean active;
     private RentalSort rentalSort;
+    private Integer countMovieItemId;
 }
