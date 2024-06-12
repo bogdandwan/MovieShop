@@ -10,13 +10,13 @@ import springbootapp.movieclub.entity.User;
 import springbootapp.movieclub.entity.enums.RentalSort;
 import springbootapp.movieclub.exceptions.NotFoundException;
 import springbootapp.movieclub.exceptions.ValidationException;
+import springbootapp.movieclub.generators.InvoiceGenerators;
 import springbootapp.movieclub.search.RentalSearch;
-import springbootapp.movieclub.service.ExpositionService;
-import springbootapp.movieclub.service.MovieItemService;
-import springbootapp.movieclub.service.RentalService;
-import springbootapp.movieclub.service.UserService;
+import springbootapp.movieclub.service.*;
 
+import java.io.File;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,10 +24,15 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class RentalController {
 
+
     private final RentalService rentalService;
     private final MovieItemService movieItemService;
     private final UserService userService;
     private final ExpositionService expositionService;
+    private final InvoiceGenerators invoiceGenerators;
+    private EmailService emailService;
+
+
 
 
     @PostMapping("/rental")
@@ -74,6 +79,10 @@ public class RentalController {
         }
 
         rentalService.saveRental(rental);
+        invoiceGenerators.generateInvoice(rental);
+        emailService.sendEmail(rental.getClient().getEmail(), "Invoice", "Your invoice is attached.", Arrays.asList(new File("invoice.pdf")));
+
+
     }
 
     @PatchMapping("/rental/{id}")
@@ -97,7 +106,7 @@ public class RentalController {
                                          @RequestParam(required = false) User worker,
                                          @RequestParam(required = false) Boolean active,
                                          @RequestParam(required = false) RentalSort rentalSort,
-                                         @RequestParam(required = false) Integer countMovieItemId){
+                                         @RequestParam(required = false) Integer countMovieItemId) {
 
 
 
@@ -126,8 +135,6 @@ public class RentalController {
                 search.setActive(false);
             }
         }
-
-
 
         final List<Rental> rentals = rentalService.findAll(search);
 

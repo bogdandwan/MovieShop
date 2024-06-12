@@ -30,6 +30,10 @@ public class User {
     private String username;
 
     @NotBlank
+    @Column(nullable = false, unique = true, name = "email")
+    private String email;
+
+    @NotBlank
     @Column(nullable = false, name = "password")
     private String password;
 

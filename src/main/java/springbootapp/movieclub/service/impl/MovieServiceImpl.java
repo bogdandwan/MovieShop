@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import springbootapp.movieclub.entity.Movie;
-import springbootapp.movieclub.entity.enums.Genre;
 import springbootapp.movieclub.repository.MovieRepository;
 import springbootapp.movieclub.search.MovieSearch;
 import springbootapp.movieclub.search.MovieSpec;

@@ -24,7 +24,6 @@ public class UserServiceImpl implements UserService {
 
 
     private final UserRepository userRepository;
-    private final RoleService roleService;
 
     private User user;
 

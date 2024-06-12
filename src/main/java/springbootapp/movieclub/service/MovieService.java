@@ -1,7 +1,6 @@
 package springbootapp.movieclub.service;
 
 import springbootapp.movieclub.entity.Movie;
-import springbootapp.movieclub.entity.enums.Genre;
 import springbootapp.movieclub.search.MovieSearch;
 
 import java.util.List;
