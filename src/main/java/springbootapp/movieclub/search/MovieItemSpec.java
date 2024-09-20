@@ -50,32 +50,6 @@ public class MovieItemSpec implements Specification<MovieItem> {
 
         predicates.add(criteriaBuilder.isNull(root.get("deletionTime")));
 
-
-        //Sortiranje
-        if(search.getMovieItemSort() != null){
-            if (search.getMovieItemSort() == MovieItemSort.PRICE_ASC){
-                query.orderBy(criteriaBuilder.asc(root.get("price")));
-            }
-        }
-        if(search.getMovieItemSort() != null){
-            if (search.getMovieItemSort() == MovieItemSort.PRICE_DESC){
-                query.orderBy(criteriaBuilder.desc(root.get("price")));
-            }
-        }
-        if (search.getMovieItemSort() != null){
-            if (search.getMovieItemSort() == MovieItemSort.NAME_ASC){
-                Join<MovieItem, Movie> movieJoin = root.join("movie");
-                query.orderBy(criteriaBuilder.asc(movieJoin.get("name")));
-            }
-        }
-        if (search.getMovieItemSort() != null){
-            if (search.getMovieItemSort() == MovieItemSort.NAME_DESC){
-                Join<MovieItem, Movie> movieJoin = root.join("movie");
-                query.orderBy(criteriaBuilder.desc(movieJoin.get("name")));
-            }
-        }
-
-
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
     }
 }

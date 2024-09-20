@@ -1,9 +1,12 @@
 package springbootapp.movieclub.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import springbootapp.movieclub.dto.pagination.Pagination;
 import springbootapp.movieclub.entity.Exposition;
+import springbootapp.movieclub.entity.enums.ExpositionSort;
 import springbootapp.movieclub.repository.ExpositionRepository;
 import springbootapp.movieclub.search.ExpositionSearch;
 import springbootapp.movieclub.search.ExpositionSpec;
@@ -28,8 +31,23 @@ public class ExpositionServiceImpl implements ExpositionService {
     }
 
     @Override
-    public List<Exposition> findAll(ExpositionSearch search) {
-        return expositionRepository.findAll(new ExpositionSpec(search));
+    public List<Exposition> findAll(ExpositionSearch search, Pagination pagination, ExpositionSort sort) {
+        return expositionRepository.findAll(new ExpositionSpec(search), pagination.pageable(buildSort(sort)));
+    }
+
+    private Sort buildSort(ExpositionSort sort) {
+        if(sort == null){
+            return Sort.by(Sort.Direction.ASC, "id");
+        }
+        boolean asc = sort.name().contains("ASC");
+        String property = switch (sort) {
+            case EXPOSITION_ID_ASC, EXPOSITION_ID_DESC -> "id";
+            case CITY_ASC, CITY_DESC -> "city";
+            case ADDRESS_ASC, ADDRESS_DESC -> "address";
+            default -> "id";
+        };
+        return Sort.by(asc ? Sort.Direction.ASC: Sort.Direction.DESC,property);
+
     }
 
     @Override

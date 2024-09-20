@@ -3,6 +3,7 @@ package springbootapp.movieclub.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import springbootapp.movieclub.dto.ApiRental;
+import springbootapp.movieclub.dto.pagination.Pagination;
 import springbootapp.movieclub.entity.Exposition;
 import springbootapp.movieclub.entity.MovieItem;
 import springbootapp.movieclub.entity.Rental;
@@ -10,9 +11,11 @@ import springbootapp.movieclub.entity.User;
 import springbootapp.movieclub.entity.enums.RentalSort;
 import springbootapp.movieclub.exceptions.NotFoundException;
 import springbootapp.movieclub.exceptions.ValidationException;
-import springbootapp.movieclub.generators.InvoiceGenerators;
 import springbootapp.movieclub.search.RentalSearch;
-import springbootapp.movieclub.service.*;
+import springbootapp.movieclub.service.ExpositionService;
+import springbootapp.movieclub.service.MovieItemService;
+import springbootapp.movieclub.service.RentalService;
+import springbootapp.movieclub.service.UserService;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -29,8 +32,6 @@ public class RentalController {
     private final MovieItemService movieItemService;
     private final UserService userService;
     private final ExpositionService expositionService;
-    private final InvoiceGenerators invoiceGenerators;
-    private EmailService emailService;
 
 
 
@@ -79,10 +80,6 @@ public class RentalController {
         }
 
         rentalService.saveRental(rental);
-        invoiceGenerators.generateInvoice(rental);
-        emailService.sendEmail(rental.getClient().getEmail(), "Invoice", "Your invoice is attached.", Arrays.asList(new File("invoice.pdf")));
-
-
     }
 
     @PatchMapping("/rental/{id}")
@@ -99,24 +96,25 @@ public class RentalController {
 
     @GetMapping("/rentals")
     public List<ApiRental> getAllRentals(@RequestParam(required = false) Long expositionId,
-                                         @RequestParam(required = false) LocalDate rentalDate,
+                                         @RequestParam(required = false) LocalDate date,
                                          @RequestParam(required = false) LocalDate rentalExpiration,
                                          @RequestParam(required = false) LocalDate returnDate,
                                          @RequestParam(required = false) User client,
                                          @RequestParam(required = false) User worker,
                                          @RequestParam(required = false) Boolean active,
-                                         @RequestParam(required = false) RentalSort rentalSort,
-                                         @RequestParam(required = false) Integer countMovieItemId) {
+                                         @RequestParam(required = false) RentalSort sort,
+                                         @RequestParam(required = false) Integer countMovieItemId,
+                                         Pagination pagination) {
 
 
 
         final RentalSearch search = new RentalSearch()
-                .setRentalDate(rentalDate)
+                .setRentalDate(date)
                 .setRentalExpiration(rentalExpiration)
                 .setReturnDate(returnDate)
                 .setClient(client)
                 .setWorker(worker)
-                .setRentalSort(rentalSort)
+                .setRentalSort(sort)
                 .setCountMovieItemId(countMovieItemId);
 
 
@@ -136,7 +134,7 @@ public class RentalController {
             }
         }
 
-        final List<Rental> rentals = rentalService.findAll(search);
+        final List<Rental> rentals = rentalService.findAll(search, pagination, sort);
 
         return rentals.stream().map(ApiRental::new).collect(Collectors.toList());
     }

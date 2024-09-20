@@ -1,6 +1,8 @@
 package springbootapp.movieclub.service;
 
+import springbootapp.movieclub.dto.pagination.Pagination;
 import springbootapp.movieclub.entity.Rental;
+import springbootapp.movieclub.entity.enums.RentalSort;
 import springbootapp.movieclub.search.RentalSearch;
 
 import java.time.LocalDate;
@@ -16,5 +18,5 @@ public interface RentalService {
 
     void updateReturnDate(Rental rental, LocalDate returnDate);
 
-    List<Rental> findAll(RentalSearch search);
+    List<Rental> findAll(RentalSearch search, Pagination pagination, RentalSort sort);
 }

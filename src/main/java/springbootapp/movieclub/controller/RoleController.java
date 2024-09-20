@@ -1,20 +1,14 @@
 package springbootapp.movieclub.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
 import springbootapp.movieclub.dto.ApiRole;
+import springbootapp.movieclub.dto.pagination.Pagination;
 import springbootapp.movieclub.entity.enums.Privilege;
 import springbootapp.movieclub.entity.Role;
 import springbootapp.movieclub.entity.enums.RoleSort;
 import springbootapp.movieclub.exceptions.NotFoundException;
 import springbootapp.movieclub.search.RoleSearch;
-import springbootapp.movieclub.search.RoleSpec;
-import springbootapp.movieclub.service.PaginationService;
 import springbootapp.movieclub.service.RoleService;
 
 import java.util.List;
@@ -25,7 +19,6 @@ import java.util.stream.Collectors;
 public class RoleController {
 
     private final RoleService roleService;
-    private final PaginationService<Role> paginationService;
 
     //@PreAuthorize("hasAnyAuthority('ROLE_W')")
     @PostMapping("/role")
@@ -53,22 +46,19 @@ public class RoleController {
 
     //@PreAuthorize("hasAnyAuthority('ROLE_R')")
     @GetMapping("/roles")
-    public Page<ApiRole> getAllRoles(@RequestParam (required = false) Privilege privilege,
+    public List<ApiRole> getAllRoles(@RequestParam (required = false) Privilege privilege,
                                      @RequestParam (required = false) String nameLike,
-                                     @RequestParam (required = false) RoleSort roleSort,
-                                     @RequestParam (required = false, defaultValue = "0") Integer offset,
-                                     @RequestParam(required = false, defaultValue = "10") Integer limit){
+                                     @RequestParam (required = false) RoleSort sort,
+                                     Pagination pagination){
         final RoleSearch search = new RoleSearch()
                 .setPrivilege(privilege)
                 .setNameLike(nameLike)
-                .setRoleSort(roleSort);
+                .setRoleSort(sort);
 
 
-        Pageable pageable = PageRequest.of(offset, limit);
-        Specification<Role> spec = new RoleSpec(search);
-        Page<Role> rolePage = paginationService.findAll(spec, pageable, Role.class);
+        final List<Role> roles = roleService.findAll(search, pagination, sort);
 
-        return rolePage.map(this::mapToApiRole);
+        return roles.stream().map(ApiRole::new).collect(Collectors.toList());
 
 
 
@@ -91,12 +81,5 @@ public class RoleController {
         roleService.softDelete(id);
     }
 
-    public ApiRole mapToApiRole(Role role){
-        ApiRole apiRole = new ApiRole();
-        apiRole.setId(role.getId());
-        apiRole.setName(role.getName());
-        apiRole.setPrivileges(role.getPrivileges());
-        return apiRole;
-    }
 
 }

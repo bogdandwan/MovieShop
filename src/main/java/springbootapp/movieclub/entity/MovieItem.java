@@ -1,10 +1,8 @@
 package springbootapp.movieclub.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import lombok.Data;
-import lombok.NonNull;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDate;
@@ -36,5 +34,4 @@ public class MovieItem {
 
     @Column(name = "available", nullable = false)
     private Boolean available;
-
 }

@@ -54,7 +54,7 @@ public class ErrorHandlerController {
     @ExceptionHandler({ClientErrorException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ApiError handleClientErrorException(ClientErrorException ex){
+    public ApiError handleClientErrorException(ClientErrorException ex) {
         return new ApiError(ex.getMessage());
     }
 }

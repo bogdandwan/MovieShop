@@ -1,29 +1,24 @@
 package springbootapp.movieclub.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
 import springbootapp.movieclub.dto.ApiActor;
+import springbootapp.movieclub.dto.pagination.Pagination;
 import springbootapp.movieclub.entity.Actor;
 import springbootapp.movieclub.entity.enums.ActorSort;
 import springbootapp.movieclub.exceptions.NotFoundException;
 import springbootapp.movieclub.search.ActorSearch;
-import springbootapp.movieclub.search.ActorSpec;
 import springbootapp.movieclub.service.ActorService;
-import springbootapp.movieclub.service.PaginationService;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
 public class ActorController {
 
     private final ActorService actorService;
-    private final PaginationService<Actor> paginationService;
-
 
     @PostMapping("/actor")
     public void saveOrUpdateActor(@RequestBody ApiActor apiActor) {
@@ -57,7 +52,7 @@ public class ActorController {
     }
 
     @GetMapping("/actors")
-    public Page<ApiActor> getAllActors(
+    public List<ApiActor> getAllActors(
             @RequestParam(required = false) String firstNameLike,
             @RequestParam(required = false) String lastNameLike,
             @RequestParam(required = false) LocalDate birthDate,
@@ -66,10 +61,9 @@ public class ActorController {
             @RequestParam(required = false) Integer ageTo,
             @RequestParam(required = false) LocalDate birthDateFrom,
             @RequestParam(required = false) LocalDate birthDateTo,
-            @RequestParam(required = false) ActorSort actorSort,
+            @RequestParam(required = false) ActorSort sort,
             @RequestParam(required = false) Integer birthYear,
-            @RequestParam(required = false, defaultValue = "0") Integer offset,
-            @RequestParam(required = false, defaultValue = "10") Integer limit) {
+            Pagination pagination) {
 
         final ActorSearch search = new ActorSearch()
                 .setFirstNameLike(firstNameLike)
@@ -80,15 +74,13 @@ public class ActorController {
                 .setAgeFrom(ageFrom)
                 .setBirthDateTo(birthDateTo)
                 .setBirthDateFrom(birthDateFrom)
-                .setActorSort(actorSort)
+                .setActorSort(sort)
                 .setBirthYear(birthYear);
 
 
-        Pageable pageable = PageRequest.of(offset, limit);
-        Specification<Actor> spec = new ActorSpec(search);
-        Page<Actor> actorPage = paginationService.findAll(spec, pageable, Actor.class);
+        final List<Actor> actors = actorService.findAll(search, pagination, sort);
 
-        return actorPage.map(this::mapToApiActor);
+        return actors.stream().map(ApiActor::new).collect(Collectors.toList());
     }
 
 
@@ -97,12 +89,4 @@ public class ActorController {
         actorService.softDelete(id);
     }
 
-    private ApiActor mapToApiActor(Actor actor) {
-        ApiActor apiActor = new ApiActor();
-        apiActor.setId(actor.getId());
-        apiActor.setFirstName(actor.getFirstName());
-        apiActor.setLastName(actor.getLastName());
-        apiActor.setBirthDate(actor.getBirthDate());
-        return apiActor;
-    }
 }

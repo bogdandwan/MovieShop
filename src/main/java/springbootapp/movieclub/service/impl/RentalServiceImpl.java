@@ -1,11 +1,14 @@
 package springbootapp.movieclub.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import springbootapp.movieclub.dto.pagination.Pagination;
 import springbootapp.movieclub.entity.MovieItem;
 import springbootapp.movieclub.entity.Rental;
 import springbootapp.movieclub.entity.User;
+import springbootapp.movieclub.entity.enums.RentalSort;
 import springbootapp.movieclub.repository.RentalRepository;
 import springbootapp.movieclub.search.RentalSearch;
 import springbootapp.movieclub.search.RentalSpec;
@@ -54,8 +57,23 @@ public class RentalServiceImpl implements RentalService {
     }
 
     @Override
-    public List<Rental> findAll(RentalSearch search) {
-        return rentalRepository.findAll(new RentalSpec(search));
+    public List<Rental> findAll(RentalSearch search, Pagination pagination, RentalSort sort) {
+        return rentalRepository.findAll(new RentalSpec(search), pagination.pageable(buildSort(sort)));
     }
+
+    private Sort buildSort(RentalSort sort) {
+        if (sort == null){
+            return Sort.by(Sort.Direction.ASC,"id");
+        }
+        boolean asc = sort.name().contains("ASC");
+        String property = switch (sort) {
+            case RENTAL_DATE_ASC, RENTAL_DATE_DESC -> "rentalDate";
+            case RENTAL_EXPIRATION_ASC, RENTAL_EXPIRATION_DESC -> "rentalExpiration";
+            case RETURN_DATE_ASC, RETURN_DATE_DESC -> "returnDate";
+            default -> "id";
+        };
+        return Sort.by(asc ? Sort.Direction.ASC: Sort.Direction.DESC,property);
+    }
+
 
 }

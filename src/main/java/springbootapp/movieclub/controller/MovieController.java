@@ -1,22 +1,17 @@
 package springbootapp.movieclub.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
 import springbootapp.movieclub.dto.ApiMovie;
+import springbootapp.movieclub.dto.pagination.Pagination;
 import springbootapp.movieclub.entity.Actor;
-import springbootapp.movieclub.entity.enums.Genre;
 import springbootapp.movieclub.entity.Movie;
+import springbootapp.movieclub.entity.enums.Genre;
 import springbootapp.movieclub.entity.enums.MovieSort;
 import springbootapp.movieclub.exceptions.NotFoundException;
 import springbootapp.movieclub.search.MovieSearch;
-import springbootapp.movieclub.search.MovieSpec;
 import springbootapp.movieclub.service.ActorService;
 import springbootapp.movieclub.service.MovieService;
-import springbootapp.movieclub.service.PaginationService;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +23,6 @@ public class MovieController {
 
     private final MovieService movieService;
     private final ActorService actorService;
-    private final PaginationService<Movie> paginationService;
 
 
    @PostMapping("/movie")
@@ -78,7 +72,7 @@ public class MovieController {
 
 
     @GetMapping("/movies")
-    public Page<ApiMovie> getAllMovies(
+    public List<ApiMovie> getAllMovies(
             @RequestParam(required = false) String nameLike,
             @RequestParam(required = false) Integer year,
             @RequestParam(required = false) Genre genre,
@@ -88,9 +82,8 @@ public class MovieController {
             @RequestParam(required = false) Integer lengthTo,
             @RequestParam(required = false) Long actorId,
             @RequestParam(required = false) String fullText,
-            @RequestParam(required = false) MovieSort movieSort,
-            @RequestParam(required = false, defaultValue = "0") Integer offset,
-            @RequestParam(required = false, defaultValue = "10") Integer limit){
+            @RequestParam(required = false) MovieSort sort,
+            Pagination pagination){
 
 
         final MovieSearch search = new MovieSearch()
@@ -103,15 +96,12 @@ public class MovieController {
                 .setLengthFrom(lengthFrom)
                 .setActorId(actorId)
                 .setFullText(fullText)
-                .setMovieSort(movieSort);
+                .setMovieSort(sort);
 
-        Pageable pageable = PageRequest.of(offset, limit);
-        Specification<Movie> spec = new MovieSpec(search);
-        Page<Movie> moviePage = paginationService.findAll(spec,pageable, Movie.class);
+        final List<Movie> movies = movieService.findAll(search, pagination, sort);
 
 
-
-        return moviePage.map(this::mapToApiMovie);
+        return movies.stream().map(ApiMovie::new).collect(Collectors.toList());
 
     }
 
@@ -125,13 +115,4 @@ public class MovieController {
        movieService.softDelete(id);
     }
 
-    public ApiMovie mapToApiMovie(Movie movie){
-       ApiMovie apiMovie = new ApiMovie();
-       apiMovie.setId(movie.getId());
-       apiMovie.setName(movie.getName());
-       apiMovie.setYear(movie.getYear());
-       apiMovie.setGenre(movie.getGenre());
-       apiMovie.setLength(movie.getLength());
-       return apiMovie;
-    }
 }

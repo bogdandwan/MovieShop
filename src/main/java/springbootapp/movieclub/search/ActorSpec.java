@@ -78,38 +78,6 @@ public class ActorSpec implements Specification<Actor> {
         predicates.add(criteriaBuilder.isNull(root.get("deletionTime")));
 
 
-        //Sortiranje
-        if (search.getActorSort() != null){
-            if (search.getActorSort() == ActorSort.FIRST_NAME_ASC){
-                query.orderBy(criteriaBuilder.asc(root.get("firstName")));
-            }
-        }
-        if (search.getActorSort() != null){
-            if (search.getActorSort() == ActorSort.LAST_NAME_ASC){
-                query.orderBy(criteriaBuilder.asc(root.get("lastName")));
-            }
-        }
-        if (search.getActorSort() != null){
-            if (search.getActorSort() == ActorSort.FIRST_NAME_DESC){
-                query.orderBy(criteriaBuilder.desc(root.get("firstName")));
-            }
-        }
-        if (search.getActorSort() != null){
-            if (search.getActorSort() == ActorSort.LAST_NAME_DESC){
-                query.orderBy(criteriaBuilder.desc(root.get("lastName")));
-            }
-        }
-        if (search.getActorSort() != null){
-            if (search.getActorSort() == ActorSort.BIRTH_DATE_ASC){
-                query.orderBy(criteriaBuilder.asc(root.get("birthDate")));
-            }
-        }
-        if (search.getActorSort() != null){
-            if (search.getActorSort() == ActorSort.BIRTH_DATE_DESC){
-                query.orderBy(criteriaBuilder.desc(root.get("birthDate")));
-            }
-        }
-
         return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
     }
 }

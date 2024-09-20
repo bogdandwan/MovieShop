@@ -1,27 +1,23 @@
 package springbootapp.movieclub.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
 import springbootapp.movieclub.dto.ApiExposition;
+import springbootapp.movieclub.dto.pagination.Pagination;
 import springbootapp.movieclub.entity.Exposition;
 import springbootapp.movieclub.entity.enums.ExpositionSort;
 import springbootapp.movieclub.exceptions.NotFoundException;
 import springbootapp.movieclub.search.ExpositionSearch;
-import springbootapp.movieclub.search.ExpositionSpec;
 import springbootapp.movieclub.service.ExpositionService;
-import springbootapp.movieclub.service.PaginationService;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
 public class ExpositionController {
 
     private final ExpositionService expositionService;
-    private final PaginationService<Exposition> paginationService;
-
 
 
     @PostMapping("/exposition")
@@ -49,28 +45,24 @@ public class ExpositionController {
 
 
     @GetMapping("/expositions")
-    public Page<ApiExposition> getExpositions(
+    public List<ApiExposition> getExpositions(
             @RequestParam(required = false) String address,
             @RequestParam(required = false) String city,
             @RequestParam(required = false) String phoneNumber,
-            @RequestParam(required = false) ExpositionSort expositionSort,
+            @RequestParam(required = false) ExpositionSort sort,
             @RequestParam(required = false) String bankAccNumberLike,
-            @RequestParam(required = false, defaultValue = "0") Integer offset,
-            @RequestParam(required = false, defaultValue = "10") Integer limit){
+            Pagination pagination){
 
         final ExpositionSearch search = new ExpositionSearch()
                 .setAddressLike(address)
                 .setCityLike(city)
                 .setPhoneNumber(phoneNumber)
                 .setBankAccNumberLike(bankAccNumberLike)
-                .setExpositionSort(expositionSort);
+                .setExpositionSort(sort);
 
-        Pageable pageable = PageRequest.of(offset, limit);
-        Specification<Exposition> spec = new ExpositionSpec(search);
-        Page<Exposition> expositionPage = paginationService.findAll(spec,pageable, Exposition.class);
+        List<Exposition> expositions = expositionService.findAll(search, pagination, sort);
 
-
-        return expositionPage.map(this::mapToApiExposition);
+        return expositions.stream().map(ApiExposition::new).collect(Collectors.toList());
 
 
     }
@@ -80,14 +72,5 @@ public class ExpositionController {
         expositionService.softDelete(id);
     }
 
-    public ApiExposition mapToApiExposition(Exposition exposition){
-        ApiExposition apiExposition = new ApiExposition();
-        apiExposition.setId(exposition.getId());
-        apiExposition.setAddress(exposition.getAddress());
-        apiExposition.setCity(exposition.getCity());
-        apiExposition.setPhoneNumber(exposition.getPhoneNumber());
-        apiExposition.setBankAccNumber(exposition.getBankAccNumber());
-        return apiExposition;
-    }
 
 }

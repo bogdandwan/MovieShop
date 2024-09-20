@@ -1,12 +1,9 @@
 package springbootapp.movieclub.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
 import springbootapp.movieclub.dto.ApiMovieItem;
+import springbootapp.movieclub.dto.pagination.Pagination;
 import springbootapp.movieclub.entity.Exposition;
 import springbootapp.movieclub.entity.Movie;
 import springbootapp.movieclub.entity.MovieItem;
@@ -14,11 +11,12 @@ import springbootapp.movieclub.entity.enums.Genre;
 import springbootapp.movieclub.entity.enums.MovieItemSort;
 import springbootapp.movieclub.exceptions.NotFoundException;
 import springbootapp.movieclub.search.MovieItemSearch;
-import springbootapp.movieclub.search.MovieItemSpec;
 import springbootapp.movieclub.service.ExpositionService;
 import springbootapp.movieclub.service.MovieItemService;
 import springbootapp.movieclub.service.MovieService;
-import springbootapp.movieclub.service.PaginationService;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,9 +24,7 @@ public class MovieItemController {
 
     private final MovieItemService movieItemService;
     private final ExpositionService expositionService;
-    private final PaginationService<MovieItem> paginationService;
     private final MovieService movieService;
-
 
 
     @PostMapping("/movie-item")
@@ -73,7 +69,7 @@ public class MovieItemController {
 
 
     @GetMapping("/movie-items")
-    public Page<ApiMovieItem> getAllMovieItems(
+    public List<ApiMovieItem> getAllMovieItems(
             @RequestParam(required = false) Double price,
             @RequestParam(required = false) Long expositionId,
             @RequestParam(required = false) Genre genre,
@@ -81,19 +77,17 @@ public class MovieItemController {
             @RequestParam(required = false) Integer lengthTo,
             @RequestParam(required = false) String movieNameLike,
             @RequestParam(required = false) Boolean available,
-            @RequestParam(required = false) MovieItemSort movieItemSort,
-            @RequestParam(required = false, defaultValue = "0") Integer offset,
-            @RequestParam(required = false, defaultValue = "10") Integer limit) {
+            @RequestParam(required = false) MovieItemSort sort,
+            Pagination pagination) {
 
-        final MovieItemSearch search = new MovieItemSearch();
-
-        search.setPrice(price);
-        search.setGenre(genre);
-        search.setMovieLengthTo(lengthTo);
-        search.setMovieNameLike(movieNameLike);
-        search.setMovieLengthFrom(lengthFrom);
-        search.setMovieItemSort(movieItemSort);
-        search.setAvailable(available);
+        final MovieItemSearch search = new MovieItemSearch()
+                .setPrice(price)
+                .setGenre(genre)
+                .setMovieLengthTo(lengthTo)
+                .setMovieNameLike(movieNameLike)
+                .setMovieLengthFrom(lengthFrom)
+                .setMovieItemSort(sort)
+                .setAvailable(available);
 
 
 
@@ -106,12 +100,10 @@ public class MovieItemController {
             search.setExposition(exposition);
         }
 
-        Pageable pageable = PageRequest.of(offset, limit);
-        Specification<MovieItem> spec = new MovieItemSpec(search);
-        Page<MovieItem> movieItemPage = paginationService.findAll(spec, pageable, MovieItem.class);
+        List<MovieItem> movieItems = movieItemService.findAll(search,pagination, sort);
 
 
-        return movieItemPage.map(this::mapToApiMovieItem);
+        return movieItems.stream().map(ApiMovieItem::new).collect(Collectors.toList());
     }
 
 
@@ -128,12 +120,5 @@ public class MovieItemController {
         movieItemService.softDelete(id);
     }
 
-    public ApiMovieItem mapToApiMovieItem(MovieItem movieItem){
-        ApiMovieItem apiMovieItem = new ApiMovieItem();
-        apiMovieItem.setId(movieItem.getId());
-        apiMovieItem.setPrice(movieItem.getPrice());
-        apiMovieItem.setAvailable(movieItem.getAvailable());
-        return apiMovieItem;
-    }
 }
 

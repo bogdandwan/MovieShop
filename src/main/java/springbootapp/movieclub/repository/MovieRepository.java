@@ -1,5 +1,6 @@
 package springbootapp.movieclub.repository;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.JpaRepository;
 import springbootapp.movieclub.entity.Movie;
@@ -9,7 +10,7 @@ import java.util.List;
 
 public interface MovieRepository extends JpaRepository<Movie, Long> {
 
-    List<Movie> findAll(Specification<Movie> spec);
+    List<Movie> findAll(Specification<Movie> spec, Pageable pageable);
 
 
 }
